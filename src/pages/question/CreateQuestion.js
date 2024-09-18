@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "react-quill/dist/quill.snow.css";
-import OptionEditor from "../components/editor/OptionEditor";
-import MyQuillEditor from "../components/editor/MyQuillEditor";
-import { getGroups, addQuestion } from "../api";
+import OptionEditor from "../../components/editor/MyQuillEditor";
+import { getGroups, addQuestion } from "../../api";
 import toast, { Toaster } from 'react-hot-toast';
+import MyQuillEditor from "../../components/editor/MyQuillEditor";
 
 const AddQuestion = () => {
   const [questionGroups, setQuestionGroups] = useState([]);

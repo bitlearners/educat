@@ -111,46 +111,238 @@ export const deleteGroup = async (gid) => {
 
 // starting of queans
 
-export const createQuestion = async (questionData) => {
-  const response = await fetch(`${API_BASE_URL}question/question.php`, {
+
+export const addQuestion = async (questionData) => {
+  const response = await fetch(`${API_BASE_URL}question/add_question.php`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(questionData),
+    body: JSON.stringify(questionData), // Send question content
   });
-  if (!response.ok) throw new Error("Failed to create question");
+
   return response.json();
 };
 
-export const getQuestion = async () => {
-  const response = await fetch(`${API_BASE_URL}question/question.php`);
-  if (!response.ok) throw new Error("Failed to fetch questions");
-  return response.json();
+
+// Fetch all questions
+export const fetchQuestions = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/question/allquelist.php`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching questions:', error);
+    throw error;
+  }
 };
 
-export const updateQuestion = async (questionData) => {
-  const response = await fetch(`${API_BASE_URL}question/question.php`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(questionData),
-  });
-  if (!response.ok) throw new Error("Failed to update question");
-  return response.json();
+// Fetch a single question by ID
+export const fetchQuestionById = async (qid) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/question/getQuestionById.php?qid=${qid}`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching question:', error);
+    throw error;
+  }
 };
 
+
+// Update an existing question
+export const updateQuestion = async (qid, payload) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/question/update_question.php?qid=${qid}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating question:', error);
+    throw error;
+  }
+};
+
+// Delete a question
 export const deleteQuestion = async (qid) => {
-  const response = await fetch(`${API_BASE_URL}question/question.php`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ qid }),
-  });
-  if (!response.ok) throw new Error("Failed to delete question");
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/question/delete_question.php?qid=${qid}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting question:', error);
+    throw error;
+  }
 };
+
+
+
+
+
+
+
+
 
 //   ending of queans
+
+
+
+// testing
+export const saveQuestion = async (questionData) => {
+  const response = await fetch(`${API_BASE_URL}test/save_question.php`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(questionData), // Send question content
+  });
+
+  return response.json();
+};
+
+
+
+// Function to fetch saved data
+export const fetchSavedData = async () => {
+  const response = await fetch(`${API_BASE_URL}test/fetch_saved_data.php`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return response.json();
+};
+
+
+
+
+
+// online exam
+export const addExam = async (questionData) => {
+  const response = await fetch(`${API_BASE_URL}exam/add_exam.php`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(questionData), // Send question content
+  });
+
+  return response.json();
+};
+
+
+
+// Function to fetch saved data
+export const getExam = async () => {
+  const response = await fetch(`${API_BASE_URL}exam/fetch_all_exams.php`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return response.json();
+};
+
+
+
+// Function to fetch saved data
+export const getInst = async () => {
+  const response = await fetch(`${API_BASE_URL}inst/getinst.php`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return response.json();
+};
+
+
+export const getExamById  = async (eid) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/exam/get_exam_by_id.php?eid=${eid}`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching question:', error);
+    throw error;
+  }
+};
+export const updateExam = async (eid, examDetails) => {
+  // Implement API call to update exam details
+};
+
+
+
+// Fetch a single question by ID
+export const getQuestionsByGroupId = async (gid) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/exam/getquegrpbyid.php?gid=${gid}`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching question:', error);
+    throw error;
+  }
+};
+
+
+
+// Function to fetch other questions not associated with a specific eid
+export const getOtherQuestions = async (eid) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/exam/getotherquestions.php?eid=${eid}`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error('Response is not an array');
+    return data;
+  } catch (error) {
+    console.error('Error fetching other questions:', error);
+    throw error;
+  }
+};
+
+// Function to update question EID
+export const updateQuestionEid = async (qid, eid) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}exam/updatequestioneid.php`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ qid, eid }),
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating question EID:', error);
+    throw error;
+  }
+};
+
+// Function to remove a question
+export const removeQuestion = async (qid) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}exam/removequestion.php`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ qid }), // Include qid in the body for DELETE request
+    });
+    if (!response.ok) throw new Error('Failed to delete question');
+    return await response.json();
+  } catch (error) {
+    console.error('Error removing question:', error);
+    throw error;
+  }
+};

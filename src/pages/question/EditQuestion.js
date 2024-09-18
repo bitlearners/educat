@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from "react";
-import "react-quill/dist/quill.snow.css";
-import OptionEditor from "../components/editor/OptionEditor";
-import MyQuillEditor from "../components/editor/MyQuillEditor";
-import { getGroups, addQuestion } from "../api";
-import toast, { Toaster } from 'react-hot-toast';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { fetchQuestionById, updateQuestion, getGroups } from '../../api';
+import Swal from 'sweetalert2';
+import MyQuillEditor from '../../components/editor/MyQuillEditor';
+import OptionEditor from '../../components/editor/OptionEditor';
 
-const AddQuestion = () => {
-  const [questionGroups, setQuestionGroups] = useState([]);
-  const [selectedGroup, setSelectedGroup] = useState("");
+const UpdateQuestion = () => {
+  const { qid } = useParams();
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
-  const [optionsCount, setOptionsCount] = useState("");
   const [options, setOptions] = useState([]);
   const [correctOption, setCorrectOption] = useState(null);
   const [marks, setMarks] = useState("");
   const [toption, setToption] = useState(""); // Total options count
+  const [questionGroups, setQuestionGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("");
 
-  // Validation state
   const [errors, setErrors] = useState({
     title: "",
     group: "",
@@ -25,16 +26,9 @@ const AddQuestion = () => {
   });
 
   useEffect(() => {
+    fetchQuestion();
     fetchQuestionGroups();
-  }, []);
-
-  useEffect(() => {
-    if (optionsCount !== "") {
-      setOptions(Array(parseInt(optionsCount)).fill(""));
-    } else {
-      setOptions([]);
-    }
-  }, [optionsCount]);
+  }, [qid]);
 
   useEffect(() => {
     if (toption !== "") {
@@ -42,9 +36,28 @@ const AddQuestion = () => {
     }
   }, [toption]);
 
+  const fetchQuestion = async () => {
+    try {
+      const data = await fetchQuestionById(qid);
+      console.log(data); // Log to check if data is fetched correctly
+      setTitle(data.question);
+      setOptions(data.options.map((opt) => opt.name));
+      setCorrectOption(data.options.findIndex((opt) => opt.isCorrect));
+      setMarks(data.mark);
+      setToption(data.options.length);
+      setSelectedGroup(data.gid);
+    } catch (error) {
+      Swal.fire('Error', 'Failed to fetch question details.', 'error');
+    }
+  };
+
   const fetchQuestionGroups = async () => {
-    const data = await getGroups();
-    setQuestionGroups(data);
+    try {
+      const data = await getGroups();
+      setQuestionGroups(data);
+    } catch (error) {
+      Swal.fire('Error', 'Failed to fetch question groups.', 'error');
+    }
   };
 
   const handleOptionChange = (index, value) => {
@@ -67,31 +80,26 @@ const AddQuestion = () => {
       correctOption: "",
     };
 
-    // Validate title
     if (!title.trim()) {
       newErrors.title = "Question title is required.";
       valid = false;
     }
 
-    // Validate group selection
     if (!selectedGroup) {
       newErrors.group = "Please select a question group.";
       valid = false;
     }
 
-    // Validate marks
     if (!marks || isNaN(marks) || marks <= 0) {
       newErrors.marks = "Marks must be a positive number.";
       valid = false;
     }
 
-    // Validate options
-    if (options.some(option => option.trim() === "")) {
+    if (options.some((option) => option.trim() === "")) {
       newErrors.options = "All options must be filled in.";
       valid = false;
     }
 
-    // Validate correct option
     if (correctOption === null) {
       newErrors.correctOption = "Correct option must be selected.";
       valid = false;
@@ -101,63 +109,49 @@ const AddQuestion = () => {
     return valid;
   };
 
-  const handleCreate = async () => {
+  const handleUpdate = async () => {
     if (!validateForm()) {
       return;
     }
 
     const payload = {
-      question: title, // Ensure title contains HTML content
-      group: selectedGroup,
-      marks: marks,
-      toption: toption, // Total number of options
-      options: options.map((option, index) => ({ name: option, isCorrect: correctOption === index })), // Format options with isCorrect field
+      question: title,
+      gid: selectedGroup,
+      mark: marks,
+      toption: toption,
+      options: options.map((option, index) => ({
+        name: option,
+        isCorrect: correctOption === index,
+      })),
     };
 
-    console.log("Payload to send:", payload); // Debug: Print the payload
-
     try {
-      const response = await addQuestion(payload); // Call the API to save the question
-      console.log("Response from API:", response);
-      toast.success('Question added successfully!'); // Show success message
-      handleReset(); // Reset form fields after success
+      await updateQuestion(qid, payload);
+      Swal.fire({
+        title: 'Success',
+        text: 'Question updated successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      }).then(() => {
+        navigate('/questions');
+      });
     } catch (error) {
-      console.error("Error adding question:", error);
-      toast.error('Failed to add question. Please try again.'); // Show error message
+      Swal.fire('Error', 'Failed to update question.', 'error');
     }
-  };
-
-  const handleReset = () => {
-    setTitle("");
-    setSelectedGroup("");
-    setMarks("");
-    setOptions([]);
-    setCorrectOption(null);
-    setToption("");
-    setErrors({
-      title: "",
-      group: "",
-      marks: "",
-      options: "",
-      correctOption: "",
-    });
   };
 
   return (
     <div className="container w-full">
-      <Toaster /> {/* Add Toaster component to show toast messages */}
-
       <div className="card bg-base-100">
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-          Question Management
+          Update Question
         </h1>
-
         <div className="flex flex-col gap-4 mb-4">
           <MyQuillEditor
             theme="snow"
             value={title}
             onChange={setTitle}
-            className={`quill-editor`}
+            className="quill-editor"
             placeholder="Enter Question Title"
           />
           {errors.title && <p className="text-red-600">{errors.title}</p>}
@@ -181,7 +175,7 @@ const AddQuestion = () => {
               type="number"
               value={marks}
               onChange={(e) => setMarks(e.target.value)}
-              className={`input input-bordered w-full max-w-xs sm:w-1/3 m-1`}
+              className="input input-bordered w-full max-w-xs sm:w-1/3 m-1"
               placeholder="Enter Marks"
               min="1"
             />
@@ -203,16 +197,23 @@ const AddQuestion = () => {
 
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {options.map((option, index) => (
-              <div key={index} className="flex flex-col p-4 bg-white rounded-lg shadow-md space-y-2">
+              <div
+                key={index}
+                className="flex flex-col p-4 bg-white rounded-lg shadow-md space-y-2"
+              >
                 <div className="flex items-center space-x-4">
-                  <span className="font-semibold text-lg text-gray-700">{String.fromCharCode(97 + index)})</span>
+                  <span className="font-semibold text-lg text-gray-700">
+                    {String.fromCharCode(97 + index)})
+                  </span>
                   <OptionEditor
                     value={option}
                     onChange={(value) => handleOptionEditorChange(index, value)}
-                    style={{ height: "100px", width: "100%" }} // Set the desired size here
+                    style={{ height: '100px', width: '100%' }}
                   />
                 </div>
-                {errors.options && <p className="text-red-600">{errors.options}</p>}
+                {errors.options && (
+                  <p className="text-red-600">{errors.options}</p>
+                )}
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
@@ -225,15 +226,23 @@ const AddQuestion = () => {
                 </label>
               </div>
             ))}
-            {errors.correctOption && <p className="text-red-600">{errors.correctOption}</p>}
+            {errors.correctOption && (
+              <p className="text-red-600">{errors.correctOption}</p>
+            )}
           </div>
 
           <div className="mt-4 flex justify-center gap-4">
-            <button onClick={handleCreate} className="btn btn-success text-white px-6 py-2 rounded-lg shadow-lg">
-              Create Question
+            <button
+              onClick={handleUpdate}
+              className="btn btn-success text-white px-6 py-2 rounded-lg shadow-lg"
+            >
+              Update Question
             </button>
-            <button onClick={handleReset} className="btn btn-secondary px-6 py-2 rounded-lg shadow-lg">
-              Reset
+            <button
+              onClick={() => navigate('/questions')}
+              className="btn btn-secondary px-6 py-2 rounded-lg shadow-lg"
+            >
+              Cancel
             </button>
           </div>
         </div>
@@ -242,4 +251,4 @@ const AddQuestion = () => {
   );
 };
 
-export default AddQuestion;
+export default UpdateQuestion;
