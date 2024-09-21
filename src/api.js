@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost/edukotaapi/";
+const API_BASE_URL = "https://edukotangp.in/edukotaapi/";
 
 export const loginUser = async (credentials) => {
   const response = await fetch(`${API_BASE_URL}login.php`, {
@@ -22,12 +22,7 @@ export const registerUser = async (userData) => {
   return response.json();
 };
 
-export const getQuestions = async (examId) => {
-  const response = await fetch(
-    `${API_BASE_URL}getQuestions.php?exam_id=${examId}`
-  );
-  return response.json();
-};
+
 
 export const submitAnswer = async (answerData) => {
   const response = await fetch(`${API_BASE_URL}submitAnswer.php`, {
@@ -39,6 +34,20 @@ export const submitAnswer = async (answerData) => {
   });
   return response.json();
 };
+
+
+export const saveAnswer = async (answerData) => {
+  const response = await fetch(`${API_BASE_URL}exam/submitans.php`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(answerData),
+  });
+  return response.json();
+};
+
+
 
 export const getReport = async (examId, userId) => {
   const response = await fetch(
@@ -343,6 +352,41 @@ export const removeQuestion = async (qid) => {
     return await response.json();
   } catch (error) {
     console.error('Error removing question:', error);
+    throw error;
+  }
+};
+
+
+
+// Fetch instructions by exam ID
+export const getInsfromExamId = async (eid) => {
+  if (!eid) {
+    throw new Error('Exam ID is required');
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}exam/getinstfromexamid.php?eid=${eid}`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching exam instructions:', error);
+    throw error;
+  }
+};
+
+
+// Fetch questions and options by exam ID
+export const getQuestionsAndOptions = async (eid) => {
+  if (!eid) {
+    throw new Error('Exam ID is required');
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}exam/getquestionsandoptions.php?eid=${eid}`);
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching questions and options:', error);
     throw error;
   }
 };

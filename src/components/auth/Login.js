@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../../api';
+import { loginUser } from '../../api'; // Assume this is your API call
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -13,7 +13,12 @@ const Login = () => {
         try {
             const response = await loginUser({ username, password });
             if (response.message === "Login successful") {
-                navigate('/instructions');
+                // Store user ID and username in session storage
+                sessionStorage.setItem('userId', response.userId);
+                sessionStorage.setItem('username', username);
+
+                // Redirect to instructions page
+                navigate('/student/exam');
             } else {
                 setError(response.message);
             }
@@ -23,7 +28,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen ">
+        <div className="flex justify-center items-center min-h-screen">
             <div className="card w-full max-w-sm shadow-xl bg-white p-6 rounded-lg">
                 <h1 className="text-2xl font-bold text-center text-green-600 mb-6">Login</h1>
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}

@@ -1,8 +1,10 @@
 {
   "name": "educat",
   "version": "0.1.0",
+  "homepage": "https://edukotangp.in/",
   "private": true,
   "dependencies": {
+    "@heroicons/react": "^2.1.5",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -11,6 +13,7 @@
     "dompurify": "^3.1.6",
     "http-proxy-middleware": "^3.0.2",
     "katex": "^0.16.11",
+    "quill": "^2.0.2",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",

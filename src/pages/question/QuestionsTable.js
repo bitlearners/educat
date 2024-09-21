@@ -53,7 +53,7 @@ const QuestionsTable = () => {
   };
 
   const handleUpdate = async (qid) => {
-    navigate(`/admin/que/update-question/${qid}`);
+    navigate(`/admin/que/update/${qid}`);
     // Optionally, refresh the questions list if the update affects the current view
     await loadQuestions(); // Refresh the question list after navigation
   };
