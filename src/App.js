@@ -12,12 +12,15 @@ import AllExams from "./pages/exam/AllExams";
 import AddNewExam from "./pages/exam/AddExam";
 import UpdateExam from "./pages/exam/UpdateExam";
 import GetExams from "./components/student/comp/GetExams";
-import DashboardLayout from './components/admin/DashboardLayout';
-import StudentLayout from './components/student/StudentLayout';
-import { Toaster } from 'react-hot-toast';
+import DashboardLayout from "./components/admin/DashboardLayout";
+import StudentLayout from "./components/student/StudentLayout";
+import { Toaster } from "react-hot-toast";
 import NotFound from "./components/NotFound";
 import ExamInstructions from "./components/student/comp/ExamInstructions";
 import ExamStart from "./components/student/comp/ExamStart";
+import AdminLogin from "./components/auth/AdminLogin";
+import AllUsers from "./components/Exam/GetAllUsersDataByDate";
+import AllUsersPassword from "./components/Exam/AllUsersPassword";
 
 const AdminRoutes = () => (
   <DashboardLayout>
@@ -29,6 +32,9 @@ const AdminRoutes = () => (
       <Route path="exam/add" element={<AddNewExam />} />
       <Route path="exam" element={<AllExams />} />
       <Route path="exam/update/:eid" element={<UpdateExam />} />
+      <Route path="login" element={<AdminLogin />} />
+      <Route path="get-users" element={<AllUsers />} />
+      <Route path="users" element={<AllUsersPassword />} />
     </Routes>
   </DashboardLayout>
 );
@@ -50,8 +56,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-      
-       
+
         <Route path="/student/*" element={<StudentRoutes />} />
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="*" element={<NotFound />} />

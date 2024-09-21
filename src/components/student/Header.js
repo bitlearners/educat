@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 const Header = () => {
-  const [userId, setUserId] = useState('');
-  const [username, setUsername] = useState('');
+  const [userId, setUserId] = useState("");
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     // Retrieve user ID and username from sessionStorage
-    const storedUserId = sessionStorage.getItem('userId');
-    const storedUsername = sessionStorage.getItem('username');
+    const storedUserId = sessionStorage.getItem("userId");
+    const storedUsername = sessionStorage.getItem("username");
 
     if (storedUserId && storedUsername) {
       setUserId(storedUserId);
@@ -17,16 +17,26 @@ const Header = () => {
 
   const handleLogout = () => {
     // Clear session storage on logout
-    sessionStorage.removeItem('userId');
-    sessionStorage.removeItem('username');
+    sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("username");
     // You can also add redirect logic here if needed
   };
 
   return (
     <header className="h-16 bg-white shadow flex items-center justify-between px-6">
-      <div className="text-xl font-semibold">Student Dashboard</div>
+      <div className="text-xl font-semibold">
+        <div className="container mx-auto py-2 px-6">
+          {/* Banner Image */}
+          <div className="w-24 mb-2">
+            <img
+              src="/assets/logo.jpg" // Replace with actual banner image URL
+              alt="Banner"
+              className="w-full h-auto object-cover rounded-lg"
+            />
+          </div>
+        </div>
+      </div>
       <div className="flex items-center space-x-4">
-     
         <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-ghost btn-circle">
             <div className="indicator">
@@ -47,8 +57,10 @@ const Header = () => {
               <span className="badge badge-xs badge-primary indicator-item"></span>
             </div>
           </label>
-          <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52">
-           
+          <ul
+            tabIndex={0}
+            className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
+          >
             <li>
               <a onClick={handleLogout}>Logout</a>
             </li>
@@ -56,7 +68,6 @@ const Header = () => {
         </div>
         <div className="flex items-center space-x-4">
           <p className="text-sm text-gray-600">Your Id, {username}</p>
-          
         </div>
       </div>
     </header>

@@ -6,6 +6,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'; //
 const Sidebar = () => {
   const [isQuestionMenuOpen, setIsQuestionMenuOpen] = useState(false);
   const [isExamMenuOpen, setIsExamMenuOpen] = useState(false);
+  const [isResultMenuOpen, setIsResultMenuOpen] = useState(false); // New state for result menu
 
   return (
     <div className="w-64 h-screen bg-gray-900 text-white flex flex-col border-r border-gray-700">
@@ -14,6 +15,7 @@ const Sidebar = () => {
       </div>
       <nav className="flex-1 p-4 space-y-2">
         <ul className="space-y-1">
+          {/* Question Management */}
           <li>
             <button
               className="flex items-center w-full p-2 text-md font-medium hover:bg-gray-700 rounded focus:outline-none"
@@ -34,17 +36,16 @@ const Sidebar = () => {
                     Questions Table
                   </Link>
                 </li>
-
                 <li>
                   <Link to="/admin/quegrp" className="block p-2 text-sm hover:bg-gray-600 rounded">
-                  Question Groups
+                    Question Groups
                   </Link>
                 </li>
-
-                
               </ul>
             )}
           </li>
+
+          {/* Exam Management */}
           <li>
             <button
               className="flex items-center w-full p-2 text-md font-medium hover:bg-gray-700 rounded focus:outline-none"
@@ -65,11 +66,34 @@ const Sidebar = () => {
                     Exams Table
                   </Link>
                 </li>
-                
               </ul>
             )}
           </li>
-       
+
+          {/* Result Management (New Section) */}
+          <li>
+            <button
+              className="flex items-center w-full p-2 text-md font-medium hover:bg-gray-700 rounded focus:outline-none"
+              onClick={() => setIsResultMenuOpen(!isResultMenuOpen)}
+            >
+              <span>Users</span>
+              {isResultMenuOpen ? <ChevronUpIcon className="ml-auto h-5 w-5" /> : <ChevronDownIcon className="ml-auto h-5 w-5" />}
+            </button>
+            {isResultMenuOpen && (
+              <ul className="ml-4 space-y-1">
+                <li>
+                  <Link to="/admin/users" className="block p-2 text-sm hover:bg-gray-600 rounded">
+                  All Users Password
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/admin/get-users" className="block p-2 text-sm hover:bg-gray-600 rounded">
+                    Get Exam Status
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
         </ul>
       </nav>
     </div>
