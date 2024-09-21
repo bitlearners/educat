@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../../api"; // Make sure to import your API call function
-import Modal from "../elements/Modal"; // Assuming you have a Modal component for showing user info
+import { registerUser } from "../../api"; // Import API call function
+import Modal from "../elements/Modal"; // Modal component
+import jsPDF from "jspdf"; // jsPDF library
+import "jspdf-autotable"; // Import AutoTable plugin for tables in PDF
 
 const Register = () => {
   const [formData, setFormData] = useState({
     username: "",
-    password: "EdukotaNagpur@9860", // Default password
+    password: "EKNag@9860", // Default password
     parentNumber: "",
     contactNo: "",
     address: "",
-    userClass: "",
+    userClass: "6th", // Default value to 6th class
     schoolName: "",
     course: "",
     dateOfExam: "",
@@ -103,9 +105,57 @@ const Register = () => {
     navigate("/login"); // Redirect to login page after closing modal
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+
+    // Add logo as banner image
+    const img = new Image();
+    img.src = "/assets/logo-educat.jpg"; // Path to your logo in the public folder
+
+    img.onload = () => {
+      // Add the logo as a banner (stretching horizontally)
+      doc.addImage(img, "PNG", 10, 10, 190, 70); // Wide banner style (190 width, 30 height)
+
+      // Add Title
+      doc.setFontSize(20);
+      doc.text("User Registration Details", 80, 50);
+
+      // Add a table for the user information using autoTable
+      doc.autoTable({
+        startY: 65, // Position to start the table
+        head: [["Field", "Details"]], // Table headers
+        body: [
+          ["User ID", userInfo.userId],
+          ["Username", userInfo.username],
+        ], // Table data
+      });
+
+      doc.save("User_Registration_Details.pdf");
+
+      // After the PDF download, close the modal and redirect to login
+      closeModal();
+    };
+
+    img.onerror = () => {
+      console.error("Image could not be loaded");
+    };
+  };
+
   return (
-    <div className="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold text-green-600 mb-6">Register</h1>
+   
+      
+
+      <div className="container mx-auto py-2 px-6">
+      {/* Banner Image */}
+      <div className="w-full mb-2">
+        <img
+         src="/assets/logo-educat.jpg"// Replace with actual banner image URL
+          alt="Banner"
+          className="w-full h-auto object-cover rounded-lg"
+        />
+      </div>
+
+      <h1 className="text-2xl font-bold text-green-600 mb-6">Register For EDUCAT</h1>
       {error && <div className="alert alert-error mb-4">{error}</div>}
       <form onSubmit={handleRegister}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -166,13 +216,19 @@ const Register = () => {
             <label className="label">
               <span className="label-text">Class</span>
             </label>
-            <input
-              type="text"
+            <select
               name="userClass"
-              className="input input-bordered w-full"
+              className="select select-bordered w-full"
               value={formData.userClass}
               onChange={handleChange}
-            />
+            >
+              {/* Dropdown from 6th to 10th */}
+              <option value="6th">6th</option>
+              <option value="7th">7th</option>
+              <option value="8th">8th</option>
+              <option value="9th">9th</option>
+              <option value="10th">10th</option>
+            </select>
           </div>
           {/* School Name */}
           <div className="form-control">
@@ -221,25 +277,28 @@ const Register = () => {
             />
           </div>
         </div>
-        <button type="submit" className="btn btn-success mt-6 w-full">
-          Register
+
+        <button
+          type="submit"
+          className="btn btn-primary mt-6 w-full"
+        >
+          Register For EDUCAT
         </button>
       </form>
 
-      {/* Modal to display user information */}
+      {/* Modal for successful registration */}
       {isModalOpen && (
         <Modal isOpen={isModalOpen} onClose={closeModal}>
-          <h2 className="text-xl font-bold text-center mb-4">
-            Registration Successful
+          <h2 className="text-xl font-bold text-green-600 mb-4">
+            Registration Successful!
           </h2>
-          <p className="text-center">
-            Your User ID is <strong>{userInfo.userId}</strong>
-          </p>
-          <p className="text-center">
-            Username: <strong>{userInfo.username}</strong>
-          </p>
-          <button onClick={closeModal} className="btn btn-primary mt-4">
-            Close
+          <p>User ID: {userInfo.userId}</p>
+          <p>Username: {userInfo.username}</p>
+          <button
+            onClick={downloadPDF}
+            className="btn btn-secondary mt-4"
+          >
+            Download PDF
           </button>
         </Modal>
       )}

@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://edukotangp.in/edukotaapi/";
+const API_BASE_URL = "http://localhost/edukotaapi/";
 
 export const loginUser = async (credentials) => {
   const response = await fetch(`${API_BASE_URL}login.php`, {
