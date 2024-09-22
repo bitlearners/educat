@@ -1,25 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getExam } from '../../../api';
 
 const GetExams = () => {
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const loadExams = async () => {
-      try {
-        const data = await getExam();
-        setExams(data);
-      } catch (error) {
-        Swal.fire('Error', 'Failed to fetch exams.', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadExams();
-  }, []);
+    // Check if user is authenticated
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    if (!user) {
+      // If no user is found, redirect to the login page
+      Swal.fire('Unauthorized', 'Please log in to access exams.', 'warning');
+      navigate('/login');
+    } else {
+      // Load exams if user is authenticated
+      const loadExams = async () => {
+        try {
+          const data = await getExam();
+          setExams(data);
+        } catch (error) {
+          Swal.fire('Error', 'Failed to fetch exams.', 'error');
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadExams();
+    }
+  }, [navigate]);
 
   if (loading) return <p>Loading...</p>;
 

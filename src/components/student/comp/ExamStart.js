@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getQuestionsAndOptions, saveAnswer } from "../../../api";
+import { useNavigate, useParams } from "react-router-dom"; // Import useParams for URL parameters
 
 function Exam() {
+  const { eid } = useParams(); // Get eid from URL parameters
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -9,11 +11,19 @@ function Exam() {
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes in seconds
   const timerId = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if the user is authenticated
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
     const fetchQuestions = async () => {
       try {
-        const data = await getQuestionsAndOptions(1); // Fetch questions with exam ID 1
+        const data = await getQuestionsAndOptions(eid); // Fetch questions using the exam ID from URL
         setQuestions(data);
         const initialStatus = data.reduce((acc, question) => {
           acc[question.qid] = "Not Visited";
@@ -36,9 +46,8 @@ function Exam() {
 
     startTimer();
 
-    // Cleanup timer on unmount
     return () => clearInterval(timerId.current);
-  }, []);
+  }, [eid, navigate]); // Add eid to dependencies
 
   const startTimer = () => {
     timerId.current = setInterval(() => {
@@ -51,7 +60,7 @@ function Exam() {
         localStorage.setItem("exam-timer", prevTime - 1);
         return prevTime - 1;
       });
-    }, 1000); // 1 second interval
+    }, 1000);
   };
 
   const formatTime = (seconds) => {
@@ -112,15 +121,16 @@ function Exam() {
     clearInterval(timerId.current); // Stop the timer
     try {
       const answersData = {
-        exam_id: 1, // Replace with actual exam ID
-        user_id: 123, // Replace with actual user ID from session or auth context
+        eid: eid, // Use actual exam ID from URL
+        uid: JSON.parse(sessionStorage.getItem("user")).uid, // Replace with actual user ID
         answers: Object.keys(answers).map((qid) => ({
           question_id: qid,
           selected_option: answers[qid],
-          marked_for_review:
-            questionStatus[qid] === "Answered & Marked for Review",
+          marked_for_review: questionStatus[qid] === "Answered & Marked for Review",
         })),
       };
+
+console.log(JSON.parse(sessionStorage.getItem("user")).uid)
 
       const result = await saveAnswer(answersData);
 

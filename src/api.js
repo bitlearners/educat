@@ -44,12 +44,6 @@ export const saveAnswer = async (answerData) => {
   return response.json();
 };
 
-export const getReport = async (examId, userId) => {
-  const response = await fetch(
-    `${API_BASE_URL}getReport.php?exam_id=${examId}&user_id=${userId}`
-  );
-  return response.json();
-};
 
 export const updateStatus = async (statusData) => {
   const response = await fetch(`${API_BASE_URL}updateStatus.php`, {
@@ -357,6 +351,25 @@ export const getInsfromExamId = async (eid) => {
   }
 };
 
+
+// Fetch instructions by exam ID
+export const getQuestionsDetail = async (eid) => {
+  if (!eid) {
+    throw new Error("Exam ID is required");
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}exam/getquestionsandoptions.php?eid=${eid}`
+    );
+    if (!response.ok) throw new Error("Network response was not ok");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching exam instructions:", error);
+    throw error;
+  }
+};
+
 // Fetch questions and options by exam ID
 export const getQuestionsAndOptions = async (eid) => {
   if (!eid) {
@@ -394,5 +407,11 @@ export const getUsers = async () => {
     },
   });
 
+  return response.json();
+};
+export const getReport = async (examId, userId) => {
+  const response = await fetch(
+    `${API_BASE_URL}getReport.php?exam_id=${examId}&user_id=${userId}`
+  );
   return response.json();
 };
